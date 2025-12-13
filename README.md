@@ -29,9 +29,26 @@ cd Real-Estate-Southern-Spain-2024
 ```bash
 pip install -r requirements.txt
 ```
+3. For mac with env:
 
+- create venv (once)
+```bash
+python3 -m venv .venv
+```
+- activate it
+```bash
+source .venv/bin/activate
+```
+- install packages listed in requirements.txt
+```bash
+python -m pip install -U pip
+python -m pip install -r requirements.txt
+```
 ## Usage
-
+run the script:
+```bash
+ python -m streamlit run bin/main.py
+```
 ### Running the Streamlit App
 
 To run the main application:
