@@ -68,37 +68,36 @@ if df is not None:
     )
     
     # Display selected property details
-    if selected_property is not None:
-        st.markdown("---")
-        st.subheader("🏡 Property Details")
-        
-        selected_row = df.iloc[selected_property]
-        
-        # Display property details in columns
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.write("**Basic Information**")
-            st.write(f"**ID:** {selected_row['id']}")
-            st.write(f"**Location:** {selected_row['location']}")
-            st.write(f"**Property Type:** {selected_row['property_type']}")
-            st.write(f"**Price:** €{selected_row['price_eur']:,}")
-            st.write(f"**Year Built:** {selected_row['year_built']}")
-        
-        with col2:
-            st.write("**Property Features**")
-            st.write(f"**Bedrooms:** {selected_row['bedrooms']}")
-            st.write(f"**Bathrooms:** {selected_row['bathrooms']}")
-            st.write(f"**Size:** {selected_row['size_sqm']} m²")
-            st.write(f"**Pool:** {selected_row['pool']}")
-            st.write(f"**Garage:** {selected_row['garage']}")
-            st.write(f"**Distance to Beach:** {selected_row['distance_to_beach_km']} km")
-        
-        st.markdown("---")
-        
-        # Show the raw data for the selected property
-        with st.expander("📋 View Raw Data"):
-            st.json(selected_row.to_dict())
+    st.markdown("---")
+    st.subheader("🏡 Property Details")
+    
+    selected_row = df.iloc[selected_property]
+    
+    # Display property details in columns
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.write("**Basic Information**")
+        st.write(f"**ID:** {selected_row['id']}")
+        st.write(f"**Location:** {selected_row['location']}")
+        st.write(f"**Property Type:** {selected_row['property_type']}")
+        st.write(f"**Price:** €{selected_row['price_eur']:,}")
+        st.write(f"**Year Built:** {selected_row['year_built']}")
+    
+    with col2:
+        st.write("**Property Features**")
+        st.write(f"**Bedrooms:** {selected_row['bedrooms']}")
+        st.write(f"**Bathrooms:** {selected_row['bathrooms']}")
+        st.write(f"**Size:** {selected_row['size_sqm']} m²")
+        st.write(f"**Pool:** {selected_row['pool']}")
+        st.write(f"**Garage:** {selected_row['garage']}")
+        st.write(f"**Distance to Beach:** {selected_row['distance_to_beach_km']} km")
+    
+    st.markdown("---")
+    
+    # Show the raw data for the selected property
+    with st.expander("📋 View Raw Data"):
+        st.json(selected_row.to_dict())
     
     # Show full dataset
     st.markdown("---")
