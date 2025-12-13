@@ -1,0 +1,16 @@
+id,location,property_type,bedrooms,bathrooms,size_sqm,price_eur,year_built,pool,garage,distance_to_beach_km
+1,Marbella,Villa,4,3,250,850000,2010,Yes,Yes,2.5
+2,Malaga,Apartment,2,1,85,195000,2015,No,No,1.2
+3,Torremolinos,Townhouse,3,2,150,320000,2008,Yes,Yes,0.5
+4,Estepona,Villa,5,4,380,1200000,2018,Yes,Yes,1.8
+5,Fuengirola,Apartment,1,1,55,145000,2012,No,No,0.8
+6,Benalmadena,Penthouse,3,2,120,425000,2016,Yes,No,1.0
+7,Marbella,Apartment,2,2,95,285000,2019,Yes,Yes,3.2
+8,Nerja,Villa,4,3,280,695000,2005,Yes,Yes,0.3
+9,Mijas,Townhouse,3,2,165,345000,2014,No,Yes,5.0
+10,Granada,Apartment,2,1,78,175000,2011,No,No,150.0
+11,Sotogrande,Villa,6,5,450,2100000,2020,Yes,Yes,0.2
+12,Malaga,Studio,1,1,42,125000,2017,No,No,2.0
+13,Torremolinos,Apartment,2,2,88,225000,2013,Yes,No,0.7
+14,Estepona,Townhouse,4,3,200,485000,2009,Yes,Yes,2.1
+15,Marbella,Penthouse,4,3,180,975000,2021,Yes,Yes,1.5
