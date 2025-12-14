@@ -2,13 +2,14 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List
+import joblib
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 
 
-def _apply_caps(df: pd.DataFrame, limit: Dict[str, float]) -> pd.DataFrame:
+def _apply_caps(df, limit):
 	df = df.copy()
 	for col, cap in limit.items():
 		if col in df.columns:
@@ -16,7 +17,7 @@ def _apply_caps(df: pd.DataFrame, limit: Dict[str, float]) -> pd.DataFrame:
 	return df
 
 
-def get_preprocessed_data() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series, pd.DataFrame, List[str]]:
+def get_preprocessed_data():
 	models_dir = Path(__file__).parent
 	csv_path = (models_dir.parent / "data" / "properties.csv").resolve()
 
@@ -124,7 +125,7 @@ def get_preprocessed_data() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.S
 		arr = ohe.transform(df_[["property_type"]])
 		df_[ohe_cols] = arr
 		return df_
-
+    
 	tr = apply_ohe(tr)
 	val = apply_ohe(val)
 	test_df = apply_ohe(test_df)
@@ -153,16 +154,30 @@ def get_preprocessed_data() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.S
 			test_df[f"{col}_log"] = np.log1p(test_df[col])
 
 	# Targets
-	y_tr = np.log1p(tr["price"]) if "price" in tr.columns else pd.Series(np.zeros(len(tr)))
-	y_val = np.log1p(val["price"]) if "price" in val.columns else pd.Series(np.zeros(len(val)))
-
+	y_tr = np.log1p(tr["price"])
+	y_val = np.log1p(val["price"]) 
+    
 	# Final feature columns selection
 	base_cols = [c for c in ["city_mean", "bedrooms", "bathrooms", "indoor surface area in sqm", "outdoor surface area in sqm"] if c in tr.columns]
 	feature_cols = base_cols + feature_names + ohe_cols
+	
+    
 
 	X_tr = tr[feature_cols].copy()
 	X_val = val[feature_cols].copy()
 	X_test = test_df[feature_cols].copy()
+	
+	preprocessing = {
+		"ohe": ohe,
+		"limit": limit,
+		"city_stats": city_stats,
+		"global_mean": global_mean,
+		"k": k,
+		"top_features": feature_names,
+		"feature_cols": feature_cols,
+	}
+
+	joblib.dump(preprocessing, models_dir / "preprocessing.joblib")
 
 	return X_tr, y_tr, X_val, y_val, X_test, feature_cols
 
