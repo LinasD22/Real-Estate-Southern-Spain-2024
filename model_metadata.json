@@ -1,6 +1,6 @@
 {
   "model_version": "1.0",
-  "trained_date": "2025-12-15T15:15:44.150358",
+  "trained_date": "2025-12-15T19:28:21.235573",
   "target_variable": "price_eur",
   "target_transform": "log1p",
   "required_features": [
@@ -9423,7 +9423,7 @@
     }
   },
   "uses_description_embeddings": true,
-  "uses_image_embeddings": false,
+  "uses_image_embeddings": true,
   "description_embedding_dim": 768,
-  "image_embedding_dim": 0
+  "image_embedding_dim": 512
 }

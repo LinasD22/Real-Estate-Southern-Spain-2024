@@ -209,7 +209,7 @@ def train_xgboost_model(splits: Dict[str, object],
     if params is None:
         custom_params = {
             'objective': 'reg:squarederror',
-            'learning_rate': 0.03,
+            'learning_rate': 0.1,
             'max_depth': 5,
             'min_child_weight': 5,
             'subsample': 0.7,
@@ -483,6 +483,7 @@ if __name__ == "__main__":
 
     if data.get('X_tr') is not None and data.get('X_val') is not None:
         print("Using pre-saved splits and splitting validation set in half...")
+        print("✅ TRAINING WITH ALL FEATURES (TABULAR + DESCRIPTION + IMAGE EMBEDDINGS)")
         
         n_tr = len(data['X_tr'])
         n_val = len(data['X_val'])
@@ -491,6 +492,7 @@ if __name__ == "__main__":
         val_idx, test_idx = train_test_split(val_indices, test_size=0.5, random_state=RANDOM_STATE)
         
         desc_emb = data.get('description_embeddings')
+        img_emb = data.get('image_embeddings')
         X_val_full = data['X_val']
         y_val_full = data['y_val']
         
@@ -504,22 +506,26 @@ if __name__ == "__main__":
             'desc_embeddings_train': desc_emb[:n_tr] if desc_emb is not None and len(desc_emb) >= n_tr else None,
             'desc_embeddings_val': desc_emb[n_tr:n_tr+n_val][val_idx] if desc_emb is not None and len(desc_emb) >= n_tr+n_val else None,
             'desc_embeddings_test': desc_emb[n_tr:n_tr+n_val][test_idx] if desc_emb is not None and len(desc_emb) >= n_tr+n_val else None,
-            'img_embeddings_train': None,
-            'img_embeddings_val': None,
-            'img_embeddings_test': None,
+            'img_embeddings_train': img_emb[:n_tr] if img_emb is not None and len(img_emb) >= n_tr else None,
+            'img_embeddings_val': img_emb[n_tr:n_tr+n_val][val_idx] if img_emb is not None and len(img_emb) >= n_tr+n_val else None,
+            'img_embeddings_test': img_emb[n_tr:n_tr+n_val][test_idx] if img_emb is not None and len(img_emb) >= n_tr+n_val else None,
         }
     else:
         print("Combining all available data and splitting according to percentages...")
-        print("⚠️  TRAINING WITHOUT IMAGE EMBEDDINGS")
-        X_all, y_all, desc_emb_all, _ = combine_all_data(data)
+        print("✅ TRAINING WITH ALL FEATURES (TABULAR + DESCRIPTION + IMAGE EMBEDDINGS)")
+        X_all, y_all, desc_emb_all, img_emb_all = combine_all_data(data)
         
         if X_all.empty or y_all is None or len(y_all) == 0:
             raise ValueError("No valid data found to train on!")
         
         print(f"Total samples: {len(X_all)}, Features: {X_all.shape[1]}")
+        if desc_emb_all is not None:
+            print(f"Description embedding dimensions: {desc_emb_all.shape[1]}")
+        if img_emb_all is not None:
+            print(f"Image embedding dimensions: {img_emb_all.shape[1]}")
 
         splits = split_data(
-            X_all, y_all, desc_emb_all, None,
+            X_all, y_all, desc_emb_all, img_emb_all,
             train_pct=TRAIN_PCT,
             test_pct=TEST_PCT,
             val_pct=VAL_PCT,
@@ -540,6 +546,9 @@ if __name__ == "__main__":
     if splits.get('desc_embeddings_train') is not None:
         n_desc = splits['desc_embeddings_train'].shape[1]
         feature_names.extend([f'desc_emb_{i}' for i in range(n_desc)])
+    if splits.get('img_embeddings_train') is not None:
+        n_img = splits['img_embeddings_train'].shape[1]
+        feature_names.extend([f'img_emb_{i}' for i in range(n_img)])
 
     if hasattr(model, 'feature_importances_'):
         fi_df = pd.DataFrame({
@@ -560,3 +569,8 @@ if __name__ == "__main__":
     print("TRAINING COMPLETE!")
     print("=" * 50)
     print("\nFiles created:")
+    print("  ✓ xgboost_model.json")
+    print("  ✓ model_metadata.json")
+    print("  ✓ api_input_schema.json")
+    print("  ✓ model_report.json")
+    print("  ✓ test_predictions.csv")
