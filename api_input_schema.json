@@ -982,6 +982,7 @@
     }
   },
   "notes": [
-    "Description text will be embedded on the backend"
+    "Description text will be embedded on the backend",
+    "Images will be embedded on the backend"
   ]
 }
