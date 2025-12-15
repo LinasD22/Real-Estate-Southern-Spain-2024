@@ -15,14 +15,14 @@ from transformers import CLIPModel, CLIPProcessor
 print("LOADED preproc.py")
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cuda" if torch.cuda.is_available() else "cpu"
 print(device)
 
-DESCRIPTIONS_DIR = Path(
-    r"C:\Users\ignas\Downloads\10962212 (1)\descriptions\descriptions"
-)
-IMAGES_DIR = Path(
-    r"C:\Users\ignas\Downloads\10962212 (1)\images\images"
-)
+# TODO if dataset iamges and decriptions are not inside these folders add
+_models_dir = Path(__file__).parent
+_data_dir = _models_dir.parent / "data"
+DESCRIPTIONS_DIR = _data_dir / "descriptions"
+IMAGES_DIR = _data_dir / "images"
 
 CLIP_MODEL_NAME = "openai/clip-vit-base-patch32"  # 512-dim
 

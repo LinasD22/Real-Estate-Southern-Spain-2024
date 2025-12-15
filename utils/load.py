@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 import re
+from pathlib import Path
 
 def get_df_data(df):
     location_vals = sorted([x for x in df["location"].dropna().unique()]) if "location" in df.columns else []
@@ -140,3 +141,107 @@ def load_data():
         st.error(f"Error loading data: {str(e)}")
         return None
 
+def get_property_images(property_id):
+    """
+    Get all image paths for a property.
+    Images should be in data/images/{property_id}/ folder.
+    """
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    images_dir = os.path.join(parent_dir, "data", "images", str(property_id))
+
+    if not os.path.exists(images_dir):
+        return []
+
+    # Supported image extensions
+    image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'}
+
+    # Get all image files
+    image_files = []
+    for file in os.listdir(images_dir):
+        if os.path.splitext(file)[1].lower() in image_extensions:
+            full_path = os.path.join(images_dir, file)
+            image_files.append(full_path)
+
+    return sorted(image_files)
+
+
+@st.cache_data
+def load_test_data():
+    """Load only the test dataset properties by recreating the train/test split."""
+    from sklearn.model_selection import train_test_split
+    
+    # Load all properties
+    df_all = load_data()
+    if df_all is None:
+        return None
+    
+    # Use the same random_state as in preproc.py (42)
+    # First split: 80% train+val, 20% test
+    train_val_df, test_df = train_test_split(
+        df_all, 
+        test_size=0.2, 
+        random_state=42
+    )
+    
+    # Return test dataset
+    return test_df.reset_index(drop=True)
+
+
+def display_property_slideshow(property_id, container=None):
+    """
+    Display a slideshow of property images using Streamlit.
+
+    Args:
+        property_id: The property ID to fetch images for
+        container: Optional Streamlit container to display in
+    """
+    images = get_property_images(property_id)
+
+    if not images:
+        if container:
+            container.info(f"No images available for this property.")
+        else:
+            st.info(f"No images available for this property.")
+        return
+
+    # Create a container for the slideshow
+    if container is None:
+        container = st
+
+    # Initialize slideshow index in session state
+    slideshow_key = f"slideshow_{property_id}"
+    if slideshow_key not in st.session_state:
+        st.session_state[slideshow_key] = 0
+
+    # Display current image and controls
+    col1, col2, col3 = container.columns([1, 8, 1])
+
+    with col1:
+        if st.button("Previous", key=f"prev_{property_id}"):
+            st.session_state[slideshow_key] = (st.session_state[slideshow_key] - 1) % len(images)
+            st.rerun()
+
+    with col2:
+        current_image_path = images[st.session_state[slideshow_key]]
+        st.image(current_image_path, use_container_width=True)
+        image_name = os.path.basename(current_image_path)
+        st.caption(f"Image {st.session_state[slideshow_key] + 1} of {len(images)}: {image_name}")
+
+    with col3:
+        if st.button("Next", key=f"next_{property_id}"):
+            st.session_state[slideshow_key] = (st.session_state[slideshow_key] + 1) % len(images)
+            st.rerun()
+
+    # Image selector
+    image_names = [os.path.basename(img) for img in images]
+    selected_image_idx = st.select_slider(
+        "Select image",
+        options=list(range(len(images))),
+        value=st.session_state[slideshow_key],
+        key=f"slider_{property_id}"
+    )
+
+    if selected_image_idx != st.session_state[slideshow_key]:
+        st.session_state[slideshow_key] = selected_image_idx
+        st.rerun()

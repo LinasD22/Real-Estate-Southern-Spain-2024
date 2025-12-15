@@ -22,9 +22,12 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-
+*.csv
 # Jupyter Notebook
 .ipynb_checkpoints
+
+**/images/
+**/descriptions/
 
 # IDEs
 .vscode/
